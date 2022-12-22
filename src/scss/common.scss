@@ -1,0 +1,155 @@
+// Заголовки, загальні БЕМ блоки та інше...
+
+/* Стилизация скролла */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: $pinkColor $greyColor;
+}
+
+/* Работает в Chrome, Edge и Safari */
+*::-webkit-scrollbar {
+  width: 5px;
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: $greyColor;
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: $pinkColor;
+  border-radius: 8px;
+}
+
+//========================================================================================================================================================
+
+.pink-color {
+  color: $pinkColor;
+}
+.green-color {
+  color: $greenColor;
+}
+
+.md-content-full {
+  @media (max-width:$mobile){
+    border-radius: 50px;
+    margin: 0 rem(-17);
+    padding: 0 rem(17); 
+    background: $greyColor;
+  }
+}
+.lg-content-full {
+  @media (max-width:$tablet){
+    border-radius: 50px;
+    margin: 0 rem(-17);
+    padding: 0 rem(17); 
+    background: $greyColor;
+  }
+}
+
+.title {
+  font-family: 'Inter';
+  font-weight: 700;
+  @include adaptiveValue("font-size", 45, 25);
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  // .title_main
+
+  &_main {
+    @include adaptiveValue("font-size", 50, 30);
+    line-height: 1.39;
+  }
+
+  // .title_sm
+
+  &_sm {
+    font-weight: 500;
+    @include adaptiveValue("font-size", 35, 20);
+    line-height: 1.3;
+  }
+}
+
+.text {
+  @include adaptiveValue("font-size", 20, 15);
+  line-height: 1.57;
+  // .text_main
+
+  &_main {
+    @include adaptiveValue("font-size", 24, 16);
+    line-height: 1.67;
+  }
+}
+
+
+//========================================================================================================================================================
+
+
+.sociable {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  @include adaptiveValue("gap", 17, 10);
+
+  // .sociable__link
+
+  &__link {
+    @include adaptiveValue("min-width", 52, 45, 0, 1512, 1100);
+    @include adaptiveValue("min-height", 52, 45, 0, 1512, 1100);
+    border-radius: 50%;
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    background-color: $pinkColor;
+    font-size: rem(25);
+    transition: all 0.4s ease 0s;
+
+    @media (any-hover: hover){
+      &:hover{
+        // opacity: .5;
+        background-color: rgba(127, 90, 240, 0.3);
+      }
+    }
+  }
+}
+
+//========================================================================================================================================================
+
+.swiper {
+}
+.swiper-wrapper {
+}
+.swiper-slide {
+}
+.swiper-pagination {
+  display: flex;
+  gap: rem(8);
+}
+
+.swiper-pagination-bullet {
+  flex: 1 1 auto;
+  height: rem(3);
+  background: #606060;
+  border-radius: 100px;
+  transition: all 0.3s ease 0s;
+}
+
+.swiper-pagination-bullet-active {
+  background: $pinkColor;
+}
+
+//========================================================================================================================================================
+.elipse {
+  background: #d2a7fd;
+  background: -moz-linear-gradient(left, #d2a7fd 43%, #35fff2 100%);
+  background: -webkit-linear-gradient(left, #d2a7fd 43%,#35fff2 100%);
+  background: linear-gradient(to right, #d2a7fd 43%,#35fff2 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d2a7fd', endColorstr='#35fff2',GradientType=1 );
+  width: 1022.2px;
+  height: 933.29px;
+  border-radius: 50%;
+  opacity: .1;
+  filter: blur(257px);
+  position: absolute;
+  z-index: -1;
+}

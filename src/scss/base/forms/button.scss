@@ -1,0 +1,100 @@
+//<BUTTONS (a.btn+tab)>
+// Сніппет (HTML): btn
+
+.button {
+	display: inline-flex;
+	justify-content:center;
+	align-items: center;
+	padding: 10px;
+	font-family: 'Manrope';
+	font-weight: 700;
+	border-radius: 100px;
+	transition: all 0.4s ease 0s;
+
+	&._fw {
+		width: 100%;
+	}
+
+	// .button_s14
+
+	&_s14 {
+		@include adaptiveValue("font-size", 14, 10);
+		line-height: 1.35;
+	}
+
+	// .button_s24
+
+	&_s24 {
+		font-family: 'Circe';
+		@include adaptiveValue("font-size", 24, 14);
+		line-height: 1.6;
+	}
+
+	// .button_h40
+
+	&_h40 {
+		height: rem(40);
+	}
+
+	// .button_h50
+
+	&_h50 {
+		@include adaptiveValue("height", 50, 37);
+	}
+
+	// .button_h80
+
+	&_h80 {
+		@include adaptiveValue("height", 80, 47);
+	}
+
+	// .button_pink
+
+	&_pink {
+		outline: 2px solid $pinkColor;
+		background-color: $pinkColor;
+
+		@media (any-hover: hover){
+			&:hover{
+				opacity: .6;
+			}
+		}
+
+		&.button_no-bg {
+			@media (any-hover: hover) {
+				&:hover {
+					background-color: $pinkColor;
+					opacity: 1;
+				}
+			}
+		}
+	}
+
+	// .button_green
+
+	&_green {
+		outline: 2px solid $greenColor;
+		background-color: $greenColor;
+
+		@media (any-hover: hover){
+			&:hover{
+				opacity: .6;
+			}
+		}
+
+		&.button_no-bg {
+			@media (any-hover: hover) {
+				&:hover {
+					background-color: $greenColor;
+					opacity: 1;
+				}
+			}
+		}
+	}
+
+	// .button_no-bg
+
+	&_no-bg {
+		background: transparent;
+	}
+}
