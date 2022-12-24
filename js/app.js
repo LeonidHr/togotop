@@ -383,6 +383,10 @@
     (() => {
         "use strict";
         const modules_flsModules = {};
+        function addActiveClass() {
+            if (window.innerWidth < 767 && document.querySelector(".how__tabs")) document.querySelector(".how__tabs").setAttribute("data-tabs", "");
+        }
+        addActiveClass();
         function isWebp() {
             function testWebP(callback) {
                 let webP = new Image;
@@ -874,6 +878,90 @@
                 }
             }
         }
+        class DynamicAdapt {
+            constructor(type) {
+                this.type = type;
+            }
+            init() {
+                this.оbjects = [];
+                this.daClassname = "_dynamic_adapt_";
+                this.nodes = [ ...document.querySelectorAll("[data-da]") ];
+                this.nodes.forEach((node => {
+                    const data = node.dataset.da.trim();
+                    const dataArray = data.split(",");
+                    const оbject = {};
+                    оbject.element = node;
+                    оbject.parent = node.parentNode;
+                    оbject.destination = document.querySelector(`${dataArray[0].trim()}`);
+                    оbject.breakpoint = dataArray[1] ? dataArray[1].trim() : "767";
+                    оbject.place = dataArray[2] ? dataArray[2].trim() : "last";
+                    оbject.index = this.indexInParent(оbject.parent, оbject.element);
+                    this.оbjects.push(оbject);
+                }));
+                this.arraySort(this.оbjects);
+                this.mediaQueries = this.оbjects.map((({breakpoint}) => `(${this.type}-width: ${breakpoint}px),${breakpoint}`)).filter(((item, index, self) => self.indexOf(item) === index));
+                this.mediaQueries.forEach((media => {
+                    const mediaSplit = media.split(",");
+                    const matchMedia = window.matchMedia(mediaSplit[0]);
+                    const mediaBreakpoint = mediaSplit[1];
+                    const оbjectsFilter = this.оbjects.filter((({breakpoint}) => breakpoint === mediaBreakpoint));
+                    matchMedia.addEventListener("change", (() => {
+                        this.mediaHandler(matchMedia, оbjectsFilter);
+                    }));
+                    this.mediaHandler(matchMedia, оbjectsFilter);
+                }));
+            }
+            mediaHandler(matchMedia, оbjects) {
+                if (matchMedia.matches) оbjects.forEach((оbject => {
+                    this.moveTo(оbject.place, оbject.element, оbject.destination);
+                })); else оbjects.forEach((({parent, element, index}) => {
+                    if (element.classList.contains(this.daClassname)) this.moveBack(parent, element, index);
+                }));
+            }
+            moveTo(place, element, destination) {
+                element.classList.add(this.daClassname);
+                if ("last" === place || place >= destination.children.length) {
+                    destination.append(element);
+                    return;
+                }
+                if ("first" === place) {
+                    destination.prepend(element);
+                    return;
+                }
+                destination.children[place].before(element);
+            }
+            moveBack(parent, element, index) {
+                element.classList.remove(this.daClassname);
+                if (void 0 !== parent.children[index]) parent.children[index].before(element); else parent.append(element);
+            }
+            indexInParent(parent, element) {
+                return [ ...parent.children ].indexOf(element);
+            }
+            arraySort(arr) {
+                if ("min" === this.type) arr.sort(((a, b) => {
+                    if (a.breakpoint === b.breakpoint) {
+                        if (a.place === b.place) return 0;
+                        if ("first" === a.place || "last" === b.place) return -1;
+                        if ("last" === a.place || "first" === b.place) return 1;
+                        return 0;
+                    }
+                    return a.breakpoint - b.breakpoint;
+                })); else {
+                    arr.sort(((a, b) => {
+                        if (a.breakpoint === b.breakpoint) {
+                            if (a.place === b.place) return 0;
+                            if ("first" === a.place || "last" === b.place) return 1;
+                            if ("last" === a.place || "first" === b.place) return -1;
+                            return 0;
+                        }
+                        return b.breakpoint - a.breakpoint;
+                    }));
+                    return;
+                }
+            }
+        }
+        const da = new DynamicAdapt("max");
+        da.init();
         class MousePRLX {
             constructor(props, data = null) {
                 let defaultConfig = {
@@ -4696,6 +4784,64 @@
                     nextEl: ".rates-tabs__slider .swiper-button-next"
                 }
             });
+            if (window.innerWidth < 1332 && document.querySelector(".slider-who-suits")) new core(".slider-who-suits", {
+                modules: [ Pagination, Navigation ],
+                observer: true,
+                observeParents: true,
+                speed: 800,
+                spaceBetween: 30,
+                breakpoints: {
+                    300: {
+                        slidesPerView: 1.2
+                    },
+                    767: {
+                        slidesPerView: 2
+                    },
+                    992: {
+                        slidesPerView: 3
+                    }
+                },
+                pagination: {
+                    el: ".slider-who-suits__pagination",
+                    clickable: true
+                },
+                navigation: {
+                    prevEl: ".slider-who-suits .swiper-button-prev",
+                    nextEl: ".slider-who-suits .swiper-button-next"
+                }
+            });
+            if (document.querySelector(".slider-why")) new core(".slider-why", {
+                modules: [ Pagination, Navigation ],
+                observer: true,
+                observeParents: true,
+                speed: 800,
+                breakpoints: {
+                    300: {
+                        spaceBetween: 23,
+                        slidesPerView: 1.2
+                    },
+                    767: {
+                        spaceBetween: 23,
+                        slidesPerView: 2.1
+                    },
+                    992: {
+                        spaceBetween: 23,
+                        slidesPerView: 3
+                    },
+                    1334: {
+                        slidesPerView: 3,
+                        spaceBetween: 42
+                    }
+                },
+                pagination: {
+                    el: ".slider-why__pagination",
+                    clickable: true
+                },
+                navigation: {
+                    prevEl: ".slider-why .swiper-button-prev",
+                    nextEl: ".slider-why .swiper-button-next"
+                }
+            });
         }
         window.addEventListener("load", (function(e) {
             initSliders();
@@ -4955,90 +5101,6 @@
                 }));
             }
         }), 0);
-        class DynamicAdapt {
-            constructor(type) {
-                this.type = type;
-            }
-            init() {
-                this.оbjects = [];
-                this.daClassname = "_dynamic_adapt_";
-                this.nodes = [ ...document.querySelectorAll("[data-da]") ];
-                this.nodes.forEach((node => {
-                    const data = node.dataset.da.trim();
-                    const dataArray = data.split(",");
-                    const оbject = {};
-                    оbject.element = node;
-                    оbject.parent = node.parentNode;
-                    оbject.destination = document.querySelector(`${dataArray[0].trim()}`);
-                    оbject.breakpoint = dataArray[1] ? dataArray[1].trim() : "767";
-                    оbject.place = dataArray[2] ? dataArray[2].trim() : "last";
-                    оbject.index = this.indexInParent(оbject.parent, оbject.element);
-                    this.оbjects.push(оbject);
-                }));
-                this.arraySort(this.оbjects);
-                this.mediaQueries = this.оbjects.map((({breakpoint}) => `(${this.type}-width: ${breakpoint}px),${breakpoint}`)).filter(((item, index, self) => self.indexOf(item) === index));
-                this.mediaQueries.forEach((media => {
-                    const mediaSplit = media.split(",");
-                    const matchMedia = window.matchMedia(mediaSplit[0]);
-                    const mediaBreakpoint = mediaSplit[1];
-                    const оbjectsFilter = this.оbjects.filter((({breakpoint}) => breakpoint === mediaBreakpoint));
-                    matchMedia.addEventListener("change", (() => {
-                        this.mediaHandler(matchMedia, оbjectsFilter);
-                    }));
-                    this.mediaHandler(matchMedia, оbjectsFilter);
-                }));
-            }
-            mediaHandler(matchMedia, оbjects) {
-                if (matchMedia.matches) оbjects.forEach((оbject => {
-                    this.moveTo(оbject.place, оbject.element, оbject.destination);
-                })); else оbjects.forEach((({parent, element, index}) => {
-                    if (element.classList.contains(this.daClassname)) this.moveBack(parent, element, index);
-                }));
-            }
-            moveTo(place, element, destination) {
-                element.classList.add(this.daClassname);
-                if ("last" === place || place >= destination.children.length) {
-                    destination.append(element);
-                    return;
-                }
-                if ("first" === place) {
-                    destination.prepend(element);
-                    return;
-                }
-                destination.children[place].before(element);
-            }
-            moveBack(parent, element, index) {
-                element.classList.remove(this.daClassname);
-                if (void 0 !== parent.children[index]) parent.children[index].before(element); else parent.append(element);
-            }
-            indexInParent(parent, element) {
-                return [ ...parent.children ].indexOf(element);
-            }
-            arraySort(arr) {
-                if ("min" === this.type) arr.sort(((a, b) => {
-                    if (a.breakpoint === b.breakpoint) {
-                        if (a.place === b.place) return 0;
-                        if ("first" === a.place || "last" === b.place) return -1;
-                        if ("last" === a.place || "first" === b.place) return 1;
-                        return 0;
-                    }
-                    return a.breakpoint - b.breakpoint;
-                })); else {
-                    arr.sort(((a, b) => {
-                        if (a.breakpoint === b.breakpoint) {
-                            if (a.place === b.place) return 0;
-                            if ("first" === a.place || "last" === b.place) return 1;
-                            if ("last" === a.place || "first" === b.place) return -1;
-                            return 0;
-                        }
-                        return b.breakpoint - a.breakpoint;
-                    }));
-                    return;
-                }
-            }
-        }
-        const da = new DynamicAdapt("max");
-        da.init();
         window.addEventListener("DOMContentLoaded", (() => {
             function addHoverToMenu() {
                 if (isMobile.any()) document.addEventListener("click", (e => {
@@ -5072,7 +5134,7 @@
                 }));
             }
             function addPrlxForReviews() {
-                if (window.innerWidth < 992) {
+                if (window.innerWidth < 992) if (document.querySelector(".content-reviews")) {
                     const reviews = document.querySelector(".content-reviews");
                     document.querySelector(".reviews").removeAttribute("data-prlx-parent");
                     reviews.removeAttribute("data-prlx-mouse");
