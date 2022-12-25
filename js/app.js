@@ -4751,7 +4751,7 @@
                     clickable: true
                 }
             });
-            if (window.innerWidth < 1332 && document.querySelector(".rates-tabs__slider")) new core(".rates-tabs__slider", {
+            if (document.querySelector(".rates-tabs__slider")) new core(".rates-tabs__slider", {
                 modules: [ Pagination, Navigation ],
                 observer: true,
                 observeParents: true,
@@ -4773,6 +4773,10 @@
                     992: {
                         initialSlide: 3,
                         slidesPerView: 3
+                    },
+                    1334: {
+                        spaceBetween: 0,
+                        slidesPerView: 8
                     }
                 },
                 pagination: {
