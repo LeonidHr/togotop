@@ -5105,6 +5105,110 @@
                 }));
             }
         }), 0);
+        document.addEventListener("DOMContentLoaded", (() => pagination(6, "#results")));
+        function pagination(posts, postsContainerClass) {
+            const getData = async url => {
+                const response = await fetch(url);
+                let result = await response.json();
+                main(result.blogItems);
+            };
+            getData("./json/blog.json");
+            function main(postsData) {
+                let currPage = 0;
+                let rows = posts;
+                const pages = Math.ceil(postsData.length / posts);
+                function displayList(arrData, rowPerPage, page) {
+                    const postsContainer = document.querySelector(postsContainerClass);
+                    postsContainer.innerHTML = "";
+                    const start = rowPerPage * page, end = start + rowPerPage;
+                    const paginatedData = arrData.slice(start, end);
+                    paginatedData.forEach((el => {
+                        const postEl = `\n          <a href="#" class="content-blog__item item-content-blog d-flex ai-center">\n            <div class="item-content-blog__img">\n              <img class="img-fluid" src="${el.imgPath}" alt="${el.title}">\n            </div>\n            <div class="item-content-blog__content">\n              <div class="item-content-blog__label label-blog">${el.filter}</div>\n              <h4 class="item-content-blog__title title-blog">${el.title}</h4>\n              <div class="item-content-blog__date label-blog">19 июль 2022</div>\n              <p class="item-content-blog__text">${el.text}</p>\n            </div>\n          </a>\n        `;
+                        postsContainer.insertAdjacentHTML("beforeend", postEl);
+                    }));
+                }
+                function displayPagination(arrData, pagesLength, page) {
+                    if (arrData.length > 6) {
+                        const paginationContainer = document.querySelector("#btnWrapper");
+                        let countBtns = 3;
+                        paginationContainer.innerHTML = "";
+                        if (pagesLength <= 3) for (let i = 0; i < pagesLength; i++) {
+                            const paginationBtn = `\n              <button class="pagination-blog__dot" data-pag-num type="button">${i + 1}</button>\n            `;
+                            paginationContainer.insertAdjacentHTML("beforeend", paginationBtn);
+                        } else if (page <= pagesLength - 3) {
+                            for (let i = page - 1; i < page + countBtns; i++) {
+                                if (-1 == i) continue;
+                                const paginationBtn = `\n              <button class="pagination-blog__dot" data-pag-num type="button">${i + 1}</button>\n            `;
+                                paginationContainer.insertAdjacentHTML("beforeend", paginationBtn);
+                            }
+                            paginationContainer.insertAdjacentHTML("beforeend", `\n              <button class="pagination-blog__dot pagination-blog__dot_no-bg" data-pag-dots type="button">...</button>\n            `);
+                            paginationContainer.insertAdjacentHTML("beforeend", `\n              <button class="pagination-blog__dot" data-pag-num type="button">${pagesLength}</button>\n            `);
+                        } else for (let i = pagesLength - 3; i < pagesLength; i++) {
+                            const paginationBtn = `\n              <button class="pagination-blog__dot" data-pag-num type="button">${i + 1}</button>\n            `;
+                            paginationContainer.insertAdjacentHTML("beforeend", paginationBtn);
+                        }
+                        addActive(null);
+                        removeDots(pagesLength);
+                    }
+                }
+                function removeDots(pagesLength) {
+                    if (document.querySelector("[data-pag-dots]")) {
+                        const btnActive = document.querySelector(".pagination-blog__dot._active");
+                        const dotsBtn = document.querySelector("[data-pag-dots]");
+                        if (+btnActive.innerHTML >= pagesLength - 3) {
+                            dotsBtn.style.display = "none";
+                            dotsBtn.nextElementSibling.style.display = "none";
+                        }
+                    }
+                }
+                function addActive(e) {
+                    const btns = document.querySelectorAll(".pagination-blog__dot");
+                    if (e && e.target.closest("[data-pag-num]")) {
+                        removeActiveFromAll(btns);
+                        e.target.classList.add("_active");
+                    } else {
+                        removeActiveFromAll(btns);
+                        btns.forEach((btn => {
+                            if (currPage + 1 == btn.innerHTML) btn.classList.add("_active");
+                        }));
+                    }
+                }
+                function removeActiveFromAll(btns) {
+                    btns.forEach((btn => {
+                        btn.classList.remove("_active");
+                    }));
+                }
+                document.querySelector(".pagination-blog ").addEventListener("click", (e => {
+                    if (e.target.closest(".pagination-blog__dot")) addActive(e);
+                    if (e.target.closest("[data-pag-next]") && currPage !== pages - 1) {
+                        ++currPage;
+                        displayList(postsData, rows, currPage);
+                        displayPagination(postsData, pages, currPage);
+                        addActive(null);
+                    }
+                    if (e.target.closest("[data-pag-prev]") && 0 !== currPage) {
+                        --currPage;
+                        displayList(postsData, rows, currPage);
+                        displayPagination(postsData, pages, currPage);
+                        addActive(null);
+                    }
+                    if (e.target.closest("[data-pag-num]")) {
+                        currPage = e.target.innerText;
+                        --currPage;
+                        displayList(postsData, rows, currPage);
+                        displayPagination(postsData, pages, currPage);
+                    }
+                    if (e.target.closest("[data-pag-dots]")) {
+                        currPage = +e.target.previousElementSibling.innerText;
+                        displayList(postsData, rows, currPage);
+                        displayPagination(postsData, pages, currPage);
+                        addActive(null);
+                    }
+                }));
+                displayList(postsData, rows, currPage);
+                displayPagination(postsData, pages, 0);
+            }
+        }
         window.addEventListener("DOMContentLoaded", (() => {
             function addHoverToMenu() {
                 if (isMobile.any()) document.addEventListener("click", (e => {
