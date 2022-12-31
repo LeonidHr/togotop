@@ -5105,14 +5105,8 @@
                 }));
             }
         }), 0);
-        document.addEventListener("DOMContentLoaded", (() => pagination(6, "#results")));
-        function pagination(posts, postsContainerClass) {
-            const getData = async url => {
-                const response = await fetch(url);
-                let result = await response.json();
-                main(result.blogItems);
-            };
-            getData("./json/blog.json");
+        function pagination({posts, postsContainerClass, paginationWrapSelector, btnClass, data}) {
+            main(data);
             function main(postsData) {
                 let currPage = 0;
                 let rows = posts;
@@ -5128,11 +5122,13 @@
                     }));
                 }
                 function displayPagination(arrData, pagesLength, page) {
+                    const paginationContainer = document.querySelector(paginationWrapSelector);
+                    paginationContainer.innerHTML = "";
+                    paginationContainer.parentElement.style.display = "none";
                     if (arrData.length > 6) {
-                        const paginationContainer = document.querySelector("#btnWrapper");
                         let countBtns = 3;
-                        paginationContainer.innerHTML = "";
-                        if (pagesLength <= 3) for (let i = 0; i < pagesLength; i++) {
+                        paginationContainer.parentElement.style.display = "flex";
+                        if (pagesLength <= 4) for (let i = 0; i < pagesLength; i++) {
                             const paginationBtn = `\n              <button class="pagination-blog__dot" data-pag-num type="button">${i + 1}</button>\n            `;
                             paginationContainer.insertAdjacentHTML("beforeend", paginationBtn);
                         } else if (page <= pagesLength - 3) {
@@ -5153,7 +5149,7 @@
                 }
                 function removeDots(pagesLength) {
                     if (document.querySelector("[data-pag-dots]")) {
-                        const btnActive = document.querySelector(".pagination-blog__dot._active");
+                        const btnActive = document.querySelector(`${btnClass}._active`);
                         const dotsBtn = document.querySelector("[data-pag-dots]");
                         if (+btnActive.innerHTML >= pagesLength - 3) {
                             dotsBtn.style.display = "none";
@@ -5162,7 +5158,7 @@
                     }
                 }
                 function addActive(e) {
-                    const btns = document.querySelectorAll(".pagination-blog__dot");
+                    const btns = document.querySelectorAll(btnClass);
                     if (e && e.target.closest("[data-pag-num]")) {
                         removeActiveFromAll(btns);
                         e.target.classList.add("_active");
@@ -5178,8 +5174,8 @@
                         btn.classList.remove("_active");
                     }));
                 }
-                document.querySelector(".pagination-blog ").addEventListener("click", (e => {
-                    if (e.target.closest(".pagination-blog__dot")) addActive(e);
+                document.querySelector(paginationWrapSelector).parentElement.addEventListener("click", (e => {
+                    if (e.target.closest(btnClass)) addActive(e);
                     if (e.target.closest("[data-pag-next]") && currPage !== pages - 1) {
                         ++currPage;
                         displayList(postsData, rows, currPage);
@@ -5208,6 +5204,66 @@
                 displayList(postsData, rows, currPage);
                 displayPagination(postsData, pages, 0);
             }
+        }
+        const files_pagination = pagination;
+        const getData = async url => {
+            const response = await fetch(url);
+            return await response.json();
+        };
+        search({
+            inputClass: ".aside-blog__input",
+            resultContainerClass: "#results",
+            url: "./json/blog.json",
+            filterContainerClass: ".tags-blog__btns",
+            resultContainerClass: "#results",
+            filterBtnClass: ".tags-blog__btn",
+            paginationWrapSelector: "#btnWrapper",
+            paginationBtnSelector: ".pagination-blog__dot"
+        });
+        async function search({url, inputClass, filterBtnClass, resultContainerClass, filterContainerClass, paginationWrapSelector, paginationBtnSelector}) {
+            const input = document.querySelector(inputClass), filterContainer = document.querySelector(filterContainerClass);
+            const data = await getData(url);
+            let postsData = data.blogItems;
+            let filter = "all";
+            let term = "";
+            files_pagination({
+                posts: 6,
+                postsContainerClass: resultContainerClass,
+                paginationWrapSelector,
+                btnClass: paginationBtnSelector,
+                data: postsData
+            });
+            function searchItems(items, term) {
+                if (0 === term.length) return items;
+                return items.filter((item => item.title.indexOf(term) > -1));
+            }
+            function filterItems(items, filter) {
+                if ("all" === filter) return items; else return items.filter((item => {
+                    if (item.filter == filter) return item;
+                }));
+            }
+            input.addEventListener("input", (e => {
+                term = input.value;
+                files_pagination({
+                    posts: 6,
+                    postsContainerClass: resultContainerClass,
+                    paginationWrapSelector,
+                    btnClass: paginationBtnSelector,
+                    data: filterItems(searchItems(postsData, term), filter)
+                });
+            }));
+            filterContainer.addEventListener("click", (e => {
+                if (e.target.closest(filterBtnClass)) {
+                    filter = e.target.innerHTML;
+                    files_pagination({
+                        posts: 6,
+                        postsContainerClass: resultContainerClass,
+                        paginationWrapSelector,
+                        btnClass: paginationBtnSelector,
+                        data: filterItems(searchItems(postsData, term), filter)
+                    });
+                }
+            }));
         }
         window.addEventListener("DOMContentLoaded", (() => {
             function addHoverToMenu() {
