@@ -5106,7 +5106,7 @@
             }
         }), 0);
         function pagination({posts, postsContainerClass, paginationWrapSelector, btnClass, data}) {
-            main(data);
+            if (document.querySelector(paginationWrapSelector)) main(data);
             function main(postsData) {
                 let currPage = 0;
                 let rows = posts;
@@ -5210,7 +5210,7 @@
             const response = await fetch(url);
             return await response.json();
         };
-        search({
+        if (document.querySelector(".aside-blog__input")) search({
             inputClass: ".aside-blog__input",
             resultContainerClass: "#results",
             url: "./json/blog.json",
